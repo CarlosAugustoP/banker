@@ -200,9 +200,9 @@ int main(int argc, char *argv[]) {
     fprintf(result,"NEED:\n");
     for(int i =0; i < totalClients; i++){
         for(int j = 0; j < argc - 1; j++){
-            printf("%d ", cliente[i][j]);
+            fprintf(result,"%d ", cliente[i][j]);
         }
-        printf("\n");
+        fprintf(result,"\n");
     }
    
    
