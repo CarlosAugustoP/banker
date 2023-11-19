@@ -19,50 +19,18 @@ int getAmountOfClients(FILE *fp) {
     return count;
 }
 
-void initMatrix(int **matrix, int row, int col) {
-    int i, j;
-    
-    matrix = (int **)malloc(row * sizeof(int *));
-    for (i = 0; i < row; i++)
-        matrix[i] = (int *)malloc(col * sizeof(int));
-    for (i = 0; i < row; i++)
-        for (j = 0; j < col; j++)
-            matrix[i][j] = 0;
-}
-
-//change later
-void subtractRows(int i, int matrix1[][i], int need[][i], int rowToSubtract, int rowToSubtractFrom) {
-    for (int j = 0; j < i; j++) {
-        need[rowToSubtractFrom][j] = matrix1[rowToSubtractFrom][j] - matrix1[rowToSubtract][j];
-    }
-}
-
-int inLine(const char *str, const char *substring, size_t substringSize) {
-    size_t substringLength = strlen(substring);
-    if (strncmp(str, substring, substringLength) == 0 && substringLength <= substringSize) {
-        return 1;  
-    } else {
-        return 0;  
-    }
-}
-
-int selectClient(const char *str) {
-    const char *rqPosition = strstr(str, "RQ");
-    const char *rlPosition = strstr(str, "RL");
-
-    if (rqPosition != NULL || rlPosition != NULL) {
-        const char *substring = (rqPosition != NULL) ? rqPosition + 2 : rlPosition + 2;
-
-        int client;
-        if (sscanf(substring, "%d", &client) == 1) {
-            return client;
-        } else {
-            return -1;
+//returns 0 if the row of matrix1 is less than or equal to the row of matrix2
+int compareRows(int **matrix1, int **matrix2, int row1, int col) {
+    for (int i = 0; i < col; i++) {
+        if (matrix1[row1][i] < matrix2[row1][i]) {
+            return 0;
         }
     }
+    return 1;
 }
 
-int **getAllocationRequests(FILE *fp, int totalClients, int totalResources, int amountRequisitions, int clientMaxResources[totalClients][totalResources]) {
+
+int **getAllocationRequests(FILE *fp, int totalClients, int totalResources, int amountRequisitions, int **clientMaxResources) {
     
     int **allocationRequests = malloc(totalClients * sizeof(int *));//allocar memoria para o array de requisições
     for (int i = 0; i < totalClients; i++) {//preencher o array de requisições com base na quantia de clientes
@@ -108,7 +76,7 @@ int **getAllocationRequests(FILE *fp, int totalClients, int totalResources, int 
                         if (token != NULL) {
                             int variable = atoi(token); 
                             if (temp != NULL && strcmp(temp, "RQ") == 0) {
-                                if (allocationRequests[client][j] > clientMaxResources[client][j]) {
+                                if (compareRows(clientMaxResources, allocationRequests, client, totalResources) == 0) {
                                     printf("The customer %d request ", client);
                                     
                                     for (int k = 0; k < totalResources; k++) {
@@ -160,7 +128,19 @@ int main(int argc, char *argv[]) {
     printf("%d\n",totalResources);
     fclose(test);
     int resourcesPerType[argc - 1];
-    int cliente[totalClients][argc - 1]; 
+    int **cliente;
+
+    cliente = malloc(totalClients * sizeof(int *));
+    for (int i = 0; i < totalClients; i++) {
+        cliente[i] = malloc((argc - 1) * sizeof(int));
+    }
+
+    for (int i = 0; i < totalClients; i++) {
+        for (int j = 0; j < argc - 1; j++) {
+            cliente[i][j] = 0;
+        }
+    }
+
     int need[totalClients][argc-1];
     int **allocation;
 
