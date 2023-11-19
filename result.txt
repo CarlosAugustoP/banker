@@ -1,23 +1,23 @@
 Allocate to customer 0 the resources 0 2 1 
 Allocate to customer 2 the resources 3 0 2 
-The customer 1 request 2 0 3 was denied because exceed its maximum need.
+The customer 1 request 2 0 3 was denied because exceed its maximum need
 Allocate to customer 1 the resources 2 0 0 
 Allocate to customer 4 the resources 0 0 2 
 Release from customer 0 the resources 0 1 1 
 Allocate to customer 3 the resources 2 1 1 
-MAXIMUM:
+Max:
 7 5 3 
 3 2 2 
 9 0 2 
 2 2 2 
 4 3 3 
-ALOCATION:
+Alocation:
 0 1 0 
 2 0 0 
 3 0 2 
 2 1 1 
 0 0 2 
-NEED:
+Need:
 7 4 3 
 1 2 2 
 6 0 0 

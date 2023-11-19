@@ -18,6 +18,15 @@ int getAmountOfClients(FILE *fp) {
      
     return count;
 }
+void print(FILE *file, int **matrix, int rows, int cols) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                fprintf(file, "%d ", matrix[i][j]);
+            }
+            fprintf(file, "\n");
+        }
+    }
+
 void init(int ***array, int rows, int cols) {
         *array = malloc(rows * sizeof(int *));
         for (int i = 0; i < rows; i++) {
@@ -145,16 +154,19 @@ int main(int argc, char *argv[]) {
     // printf("%d\n",totalRequests);
 
     fclose(test);
-    int resourcesPerType[argc - 1];
+    int work[argc - 1];
     int **cliente;
     int **alocation;
     int **max;
+    
+    for(int i = 0 ; i < argc - 1; i++){
+        work[i] = atoi(argv[i + 1]);
+    }
 
     init(&max, totalClients, argc - 1);
     init(&alocation, totalClients, argc - 1);
     init(&cliente, totalClients, argc - 1);
 
-    
     if (customers == NULL) {
         perror("Fail to read customer.txt\n");
         return 1;
@@ -191,34 +203,16 @@ int main(int argc, char *argv[]) {
     processRequest(commands, argc - 1, totalClients, cliente,result,alocation);
     sumMatrixes(alocation,cliente,max,totalClients,argc - 1);
 
-    fprintf(result,"MAXIMUM:\n");
-    for(int i =0; i < totalClients; i++){
-        for(int j = 0; j < argc - 1; j++){
-            fprintf(result,"%d ", max[i][j]);
-        }
-        fprintf(result,"\n");
-    }
+    fprintf(result,"Max:\n");
+    print(result, max, totalClients, argc - 1);
+    fprintf(result,"Alocation:\n");
+    print(result, alocation, totalClients, argc - 1);
+    fprintf(result,"Need:\n");
+    print(result, cliente, totalClients, argc - 1);
 
-    fprintf(result,"ALOCATION:\n");
-    for(int i =0; i < totalClients; i++){
-        for(int j = 0; j < argc - 1; j++){
-            fprintf(result,"%d ", alocation[i][j]);
-        }
-        fprintf(result,"\n");
-    }
-   
-    fprintf(result,"NEED:\n");
-    for(int i =0; i < totalClients; i++){
-        for(int j = 0; j < argc - 1; j++){
-            fprintf(result,"%d ", cliente[i][j]);
-        }
-        fprintf(result,"\n");
-    }
-    
-
-   fclose(customers);  
-   fclose(commands);
-   fclose(result);
+    fclose(customers);  
+    fclose(commands);
+    fclose(result);
   
    
 
