@@ -18,7 +18,15 @@ int getAmountOfClients(FILE *fp) {
      
     return count;
 }
-
+void init(int ***array, int rows, int cols) {
+        *array = malloc(rows * sizeof(int *));
+        for (int i = 0; i < rows; i++) {
+            (*array)[i] = malloc(cols * sizeof(int));
+            for (int j = 0; j < cols; j++) {
+                (*array)[i][j] = 0;
+            }
+        }
+    }
 int **subtractMatrixes(int **matrix1,int **matrix2, int **resultmatrix, int totalClients, int totalResources){
     for (int i = 0; i < totalClients; i++) {
             for (int j = 0; j < totalResources; j++) {
@@ -39,7 +47,7 @@ int **sumMatrixes(int **matrix1,int **matrix2, int **resultmatrix, int totalClie
 
 }
 
-void processRequest(FILE *fp, int totalResources, int totalClients, int **clientMaxResources,FILE *result) {
+void processRequest(FILE *fp, int totalResources, int totalClients, int **clientMaxResources,FILE *result, int **allocation) {
     if (fp == NULL){
         printf("Fail to read commands.txt");
         return;
@@ -73,7 +81,7 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                     fprintf(result, "%d ", resourceArray[i]);
                     }
 
-                    fprintf(result, "was denied because exceed its maximum need.\n");
+                    fprintf(result, "was denied because exceed its maximum need\n");
                     flag = 0;
                     break;
                 }
@@ -83,7 +91,10 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
 
                 for(int i = 0; i < totalResources; i++){
                     fprintf(result, "%d ", resourceArray[i]);
+                    allocation[client][i] += resourceArray[i];
                 }
+
+                
 
                 fprintf(result,"\n");
 
@@ -111,6 +122,7 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
 
                 for(int i = 0; i < totalResources; i++){
                     clientMaxResources[client][i] += resourceArray[i];
+                    allocation[client][i] -= resourceArray[i];
                 }
                
             }
@@ -130,38 +142,19 @@ int main(int argc, char *argv[]) {
     int totalClients = getAmountOfClients(customers);
     int totalRequests = getAmountOfClients(test);
 
-    printf("%d\n",totalRequests);
+    // printf("%d\n",totalRequests);
+
     fclose(test);
     int resourcesPerType[argc - 1];
     int **cliente;
     int **alocation;
-    
-    alocation = malloc(totalClients * sizeof(int *));
-    for (int i = 0; i < totalClients; i++) {
-        alocation[i] = malloc((argc - 1) * sizeof(int));
-    }
+    int **max;
 
-    for (int i = 0; i < totalClients; i++) {
-        for (int j = 0; j < argc - 1; j++) {
-            alocation[i][j] = 0;
-        }
-    }
-
-
-    cliente = malloc(totalClients * sizeof(int *));
-    for (int i = 0; i < totalClients; i++) {
-        cliente[i] = malloc((argc - 1) * sizeof(int));
-    }
-
-    for (int i = 0; i < totalClients; i++) {
-        for (int j = 0; j < argc - 1; j++) {
-            cliente[i][j] = 0;
-        }
-    }
+    init(&max, totalClients, argc - 1);
+    init(&alocation, totalClients, argc - 1);
+    init(&cliente, totalClients, argc - 1);
 
     
-
-   
     if (customers == NULL) {
         perror("Fail to read customer.txt\n");
         return 1;
@@ -195,8 +188,25 @@ int main(int argc, char *argv[]) {
      return 1;
    }
 
-    processRequest(commands, argc - 1, totalClients, cliente,result);
+    processRequest(commands, argc - 1, totalClients, cliente,result,alocation);
+    sumMatrixes(alocation,cliente,max,totalClients,argc - 1);
 
+    fprintf(result,"MAXIMUM:\n");
+    for(int i =0; i < totalClients; i++){
+        for(int j = 0; j < argc - 1; j++){
+            fprintf(result,"%d ", max[i][j]);
+        }
+        fprintf(result,"\n");
+    }
+
+    fprintf(result,"ALOCATION:\n");
+    for(int i =0; i < totalClients; i++){
+        for(int j = 0; j < argc - 1; j++){
+            fprintf(result,"%d ", alocation[i][j]);
+        }
+        fprintf(result,"\n");
+    }
+   
     fprintf(result,"NEED:\n");
     for(int i =0; i < totalClients; i++){
         for(int j = 0; j < argc - 1; j++){
@@ -204,8 +214,7 @@ int main(int argc, char *argv[]) {
         }
         fprintf(result,"\n");
     }
-   
-   
+    
 
    fclose(customers);  
    fclose(commands);

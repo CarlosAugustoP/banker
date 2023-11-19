@@ -5,6 +5,18 @@ Allocate to customer 1 the resources 2 0 0
 Allocate to customer 4 the resources 0 0 2 
 Release from customer 0 the resources 0 1 1 
 Allocate to customer 3 the resources 2 1 1 
+MAXIMUM:
+7 5 3 
+3 2 2 
+9 0 2 
+2 2 2 
+4 3 3 
+ALOCATION:
+0 1 0 
+2 0 0 
+3 0 2 
+2 1 1 
+0 0 2 
 NEED:
 7 4 3 
 1 2 2 
