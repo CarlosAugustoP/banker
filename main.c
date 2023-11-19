@@ -62,11 +62,25 @@ int selectClient(const char *str) {
     }
 }
 
-int **getAllocationRequests(FILE *fp, int totalClients, int totalResources, int amountRequisitions) {
-
+int **getAllocationRequests(FILE *fp, int totalClients, int totalResources, int amountRequisitions, int clientMaxResources[totalClients][totalResources]) {
+    
     int **allocationRequests = malloc(totalClients * sizeof(int *));//allocar memoria para o array de requisições
     for (int i = 0; i < totalClients; i++) {//preencher o array de requisições com base na quantia de clientes
         allocationRequests[i] = malloc(totalResources * sizeof(int));//agora, criar um array de recursos para cada cliente, com base na quantia dos tipos de recurso.
+    }
+
+    for (int i = 0; i < totalClients; i++) {
+        for (int j = 0; j < totalResources; j++) {
+            allocationRequests[i][j] = 0;
+        }
+    }
+
+    printf("Matrix:\n");
+    for (int i = 0; i < totalClients; i++) {
+        for (int j = 0; j < totalResources; j++) {
+            printf("%d ", allocationRequests[i][j]);
+        }
+        printf("\n");
     }
 
     char *line = NULL;
@@ -81,18 +95,40 @@ int **getAllocationRequests(FILE *fp, int totalClients, int totalResources, int 
         if (getline(&line, &line_length, fp) != -1) { 
             if (strstr(line, "*") != NULL) {
                 printf("exiting\n");
-
-                    break; // Break the loop if * is found
+                    break; 
             }    
             char *token = strtok(line, " ");
+            char *temp = token;
+            printf("command: %s\n", token);
             if (token != NULL && (strcmp(token, "RQ") == 0 || strcmp(token, "RL") == 0)) {
                 int client = atoi(strtok(NULL, " "));
                 if (client >= 0 && client < totalClients) {
                     for (int j = 0; j < totalResources; j++) {
                         token = strtok(NULL, " ");
                         if (token != NULL) {
-                            
-                            allocationRequests[client][j] = atoi(token);
+                            int variable = atoi(token); 
+                            if (temp != NULL && strcmp(temp, "RQ") == 0) {
+                                if (allocationRequests[client][j] > clientMaxResources[client][j]) {
+                                    printf("The customer %d request ", client);
+                                    
+                                    for (int k = 0; k < totalResources; k++) {
+                                        printf("%d ", allocationRequests[client][k]);
+                                    }
+
+                                    printf("was denied because exceed its maximum need\n");
+                                } else {
+                                    printf("Allocate to customer %d the resources ", client);
+                                    
+                                    for (int k = 0; k < totalResources; k++) {
+                                        printf("%d ", allocationRequests[client][k]);
+                                    }
+                                    printf("\n");
+
+                                    allocationRequests[client][j] = allocationRequests[client][j] + variable;                                
+                                }
+                            } else if (temp != NULL && strcmp(temp, "RL") == 0 ){
+                                allocationRequests[client][j] = allocationRequests[client][j] - variable;
+                            }
                         } else {
                             fprintf(stderr, "Error reading from file\n");
                             return NULL;
@@ -114,6 +150,7 @@ int **getAllocationRequests(FILE *fp, int totalClients, int totalResources, int 
 
     return allocationRequests;
 }
+
 
 int main(int argc, char *argv[]) {
     FILE *customers = fopen("customer.txt", "r");
@@ -189,7 +226,7 @@ int main(int argc, char *argv[]) {
      return 1;
    }
 
-   allocation = getAllocationRequests(commands, totalClients, argc - 1, totalResources);
+   allocation = getAllocationRequests(commands, totalClients, argc - 1, totalResources, cliente);
    
    for (int i = 0; i < totalClients; i++) {
       printf("Requisicao: %d:\n",i);  
