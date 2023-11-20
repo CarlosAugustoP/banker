@@ -16,12 +16,12 @@ int getAmountOfClients(FILE *fp) {
     while (getline(&line, &line_length, fp) != -1) {
         count++;
     }
-     
+
     return count;
 }
 
 int bankersTest(int totalClients, int totalResources, int *available, int **clientMaxResources, int **allocation, int **need) {
-    
+
     int *safeSeq = malloc(totalClients * sizeof(int));
     int *finished = malloc(totalClients * sizeof(int));
     int *work = malloc(totalResources * sizeof(int));
@@ -114,12 +114,12 @@ int **sumMatrixes(int **matrix1,int **matrix2, int **resultmatrix, int totalClie
 
 
 void processRequest(FILE *fp, int totalResources, int totalClients, int **clientMaxResources,FILE *result, int **allocation, int work[], int **max) {
-    
+
     for (int i =0;i<totalResources;i++){
         printf("%d ",work[i]);
-        
+
     }
-    
+
     if (fp == NULL){
         printf("Fail to read commands.txt");
         return;
@@ -128,9 +128,9 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
     char *line = NULL;
     size_t line_length = 0;
     int client;
-    char command[2];
+    char command[3];
     int *resourceArray;
-   
+
     while(getline(&line, &line_length, fp) != -1){
          if (strcmp(line, "*\n") == 0) {
             fprintf(result,"Max:\n");
@@ -146,28 +146,29 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
             for (int i =0;i<totalResources;i++){
                 fprintf(result,"%d ",work[i]);
             }fprintf(result,"\n");
-            
-        }
-        
+
+        }else{
+
         char *token = strtok(line, " ");
+
         strcpy(command,token);
         token = strtok(NULL, " ");
         client = atoi(token);
-        token = strtok(NULL, " ");
+        token = strtok(NULL, " ");//problema encontrado
         resourceArray = malloc(totalResources * sizeof(int));
 
         for (int i = 0; i < totalResources; i++) {
             resourceArray[i] = atoi(token);
             token = strtok(NULL, " ");
         }
-        
+
         int maximumNeedFlag = 1;
         if (strcmp(command, "RQ") == 0) {
             for(int i = 0; i < totalResources; i++){
 
                 if(resourceArray[i] > clientMaxResources[client][i]){
                     fprintf(result,"The customer %d request ", client);
-                    
+
                     for(int i = 0; i < totalResources; i++){
                     fprintf(result, "%d ", resourceArray[i]);
                     }
@@ -177,13 +178,13 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                     break;
 
                 }else if (resourceArray[i] > work[i]){
-                    fprintf(result,"The resources ", client);
-                    
+                    fprintf(result,"The resources ");
+
                     for(int i = 0; i < totalResources; i++){
                      fprintf(result, "%d ", work[i]);
                     }
 
-                    fprintf(result, "are not enough to customer %d request ");
+                    fprintf(result, "are not enough to customer %d request ",client);
 
                     for(int i = 0; i < totalResources; i++){
                     fprintf(result, "%d ", resourceArray[i]);
@@ -193,15 +194,15 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
 
                     maximumNeedFlag = 0;
                     break;
-                
+
                 }
-                
-                 
+
+
              }
-           
-             
-             
-            
+
+
+
+
 
             if (maximumNeedFlag){
                 fprintf(result, "Allocate to customer %d the resources ", client);
@@ -211,9 +212,9 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                     allocation[client][i] += resourceArray[i];
                     work[i] = work[i] - resourceArray[i];     
                     printf("%d ",work[i]);
-                    
+
                 }
-                
+
 
 
                 fprintf(result,"\n");
@@ -224,24 +225,24 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
 
                 if (!bankersTest(totalClients,totalResources,work,max,allocation,clientMaxResources)){
                     fprintf(result,"The customer %d request ", client);
-                    
+
                      for(int i = 0; i < totalResources; i++){
                         fprintf(result, "%d ", resourceArray[i]);
                      }
 
                     fprintf(result, "was denied because result in an unsafe state\n");
 
-                     
+
                     for(int i = 0; i < totalResources; i++){
                         allocation[client][i] -= resourceArray[i];
                         work[i] += resourceArray[i];
                     }//desfazer alocacao
-                  
+
                   }
-               
+
             }
         } else if (strcmp(command, "RL") == 0) {
-        
+
             int flag = 1;
             for(int i = 0; i < totalResources; i++){
                 if(resourceArray[i] > allocation[client][i]){
@@ -270,11 +271,11 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                     clientMaxResources[client][i] += resourceArray[i];
                     allocation[client][i] -= resourceArray[i];
                 }
-               
-            }
-               
-        }
 
+            }
+
+        }
+         }
 }
 }
 
@@ -293,12 +294,12 @@ int main(int argc, char *argv[]) {
     int **cliente;
     int **alocation;
     int **max;
-    
+
     for(int i = 0 ; i < argc-1; i++){
         available[i] = atoi(argv[i+1]);
     }
 
-    
+
 
     init(&max, totalClients, argc - 1);
     init(&alocation, totalClients, argc - 1);
@@ -308,7 +309,7 @@ int main(int argc, char *argv[]) {
         perror("Fail to read customer.txt\n");
         return 1;
     }
-    
+
     printf("Total clients: %d\n", totalClients);
 
     rewind(customers);
@@ -349,13 +350,13 @@ int main(int argc, char *argv[]) {
    }
 
     processRequest(commands, argc - 1, totalClients, cliente,result,alocation,available,max);
-    
+
 
     fclose(customers);  
     fclose(commands);
     fclose(result);
-  
-   
+
+
 
     return 0;
 }
