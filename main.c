@@ -20,6 +20,59 @@ int getAmountOfClients(FILE *fp) {
     return count;
 }
 
+int bankersTest(int totalClients, int totalResources, int *available, int **clientMaxResources, int **allocation, int **need) {
+    
+    int *safeSeq = malloc(totalClients * sizeof(int));
+    int *finished = malloc(totalClients * sizeof(int));
+    int *work = malloc(totalResources * sizeof(int));
+
+    for (int i = 0; i < totalClients; i++) {
+        finished[i] = 0;
+    }
+
+    for (int i = 0; i < totalResources; i++) {
+        work[i] = available[i];
+    }
+
+    int cont = 0;
+    int found;
+
+    while (cont < totalClients) {
+        found = 0;
+        for (int i = 0; i < totalClients; i++) {
+            if (finished[i] == 0) {
+                int j;
+                for (j = 0; j < totalResources; j++) {
+                    if (need[i][j] > work[j]) {
+                        break;
+                    }
+                }
+                if (j == totalResources) {
+                    for (int k = 0; k < totalResources; k++) {
+                        work[k] += allocation[i][k];
+                    }
+                    safeSeq[cont++] = i;
+                    finished[i] = 1;
+                    found = 1;
+                }
+            }
+        }
+        if (!found) {
+            break;
+        }
+    }
+
+    free(finished);
+    free(work);
+
+    if (cont == totalClients) {
+        free(safeSeq);
+        return 1;
+    } else {
+        free(safeSeq);
+        return 0;
+    }
+}
 void print(FILE *file, int **matrix, int rows, int cols) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -59,8 +112,8 @@ int **sumMatrixes(int **matrix1,int **matrix2, int **resultmatrix, int totalClie
 
 }
 
+
 void processRequest(FILE *fp, int totalResources, int totalClients, int **clientMaxResources,FILE *result, int **allocation, int work[], int **max) {
-    
     
     for (int i =0;i<totalResources;i++){
         printf("%d ",work[i]);
@@ -80,7 +133,6 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
    
     while(getline(&line, &line_length, fp) != -1){
          if (strcmp(line, "*\n") == 0) {
-            sumMatrixes(allocation,clientMaxResources,max,totalClients,totalResources);
             fprintf(result,"Max:\n");
             print(result, max , totalClients, totalResources);
 
@@ -143,7 +195,12 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                     break;
                 
                 }
-            }
+                
+                 
+             }
+           
+             
+             
             
 
             if (maximumNeedFlag){
@@ -164,6 +221,23 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                 for(int i = 0; i < totalResources; i++){
                     clientMaxResources[client][i] -= resourceArray[i];
                 }
+
+                if (!bankersTest(totalClients,totalResources,work,max,allocation,clientMaxResources)){
+                    fprintf(result,"The customer %d request ", client);
+                    
+                     for(int i = 0; i < totalResources; i++){
+                        fprintf(result, "%d ", resourceArray[i]);
+                     }
+
+                    fprintf(result, "was denied because result in an unsafe state\n");
+
+                     
+                    for(int i = 0; i < totalResources; i++){
+                        allocation[client][i] -= resourceArray[i];
+                        work[i] += resourceArray[i];
+                    }//desfazer alocacao
+                  
+                  }
                
             }
         } else if (strcmp(command, "RL") == 0) {
@@ -215,13 +289,13 @@ int main(int argc, char *argv[]) {
     // printf("%d\n",totalRequests);
 
     fclose(test);
-    int work[argc - 1];
+    int available[argc - 1];
     int **cliente;
     int **alocation;
     int **max;
     
     for(int i = 0 ; i < argc-1; i++){
-        work[i] = atoi(argv[i+1]);
+        available[i] = atoi(argv[i+1]);
     }
 
     
@@ -242,7 +316,18 @@ int main(int argc, char *argv[]) {
      for (int i = 0; i < totalClients; i++) {
         for (int j = 0; j < argc - 1; j++) {
             if (fscanf(customers, "%d,", &cliente[i][j]) != 1) {
-                fprintf(stderr, "Error reading from file\n");
+                fprintf(stderr, "Fail to read customer.txt\n");
+                return 1;
+            }
+        }
+    }
+
+    rewind(customers);
+
+    for (int i = 0; i < totalClients; i++) {
+        for (int j = 0; j < argc - 1; j++) {
+            if (fscanf(customers, "%d,", &max[i][j]) != 1) {
+                fprintf(stderr, "Fail to read customer.txt\n");
                 fclose(customers);
                 return 1;
             }
@@ -263,7 +348,7 @@ int main(int argc, char *argv[]) {
      return 1;
    }
 
-    processRequest(commands, argc - 1, totalClients, cliente,result,alocation,work,max);
+    processRequest(commands, argc - 1, totalClients, cliente,result,alocation,available,max);
     
 
     fclose(customers);  
