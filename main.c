@@ -25,12 +25,22 @@ int countSpaces(char *line){
     return count;
 }
 int isCommandsProperlyFormated(FILE *fp, int totalResources) {
+    int spacecounter = 0;
     int count = 0;
     char *line = NULL;
     size_t line_length = 0;
 
 
     while (getline(&line, &line_length, fp) != -1) {
+        
+        //printf("number of spaces in line:%d\n",countSpaces(line));
+
+        if (countSpaces(line)!= totalResources + 1 && strcmp(line, "*\n") != 0) {
+            //printf("TESTING:%d\n",countSpaces(line));
+            //printf("Invalid number of arguments in line %d.\n", count + 1);
+            return 0;
+        }
+
         count++;
 
         if (strcmp(line, "*\n") == 0) {
@@ -85,11 +95,24 @@ int isCustomersProperlyFormated(FILE *fp, int totalResources) {
     size_t line_length = 0;
 
     while (getline(&line, &line_length, fp) != -1) {
+        printf("%d",strlen(line));
+        if (countSpaces(line) != 0) {
+            printf("Invalid number of spaces in line %d.\n", count + 1);
+            return 0;
+        }
         
         if (strspn(line, " \t\n") == strlen(line)) {
             printf("Empty line detected.\n");
             return 0;
         }
+
+        for (int j = 0; j < strlen(line); j++) {
+                if (isalpha(line[j])) {
+                    printf("Invalid character detected in line %d.\n", count + 1);
+                    return 0;
+                }
+            }
+
 
         count++;
     }
@@ -379,6 +402,15 @@ int main(int argc, char *argv[]) {
     }
 
     FILE *customers = fopen("customer.txt", "r");
+
+    fseek(customers, 0, SEEK_END); 
+    fileSize = ftell(customers); 
+    fseek(customers, 0, SEEK_SET);
+    
+    if(fileSize == 0){
+        printf("Fail to read customer.txt\n");
+        exit(EXIT_FAILURE);
+    }
 
     if (customers == NULL) {
         printf("Fail to read customer.txt\n");
