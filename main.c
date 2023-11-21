@@ -33,18 +33,18 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
         count++;
 
         if (strcmp(line, "*\n") == 0) {
-            break;
+            continue;
         }
 
         char *token = strtok(line, " ");
-
+        printf("FIRST TOKEN:%s\n",token);
         if (strcmp(token, "RQ") != 0 && strcmp(token, "RL") != 0) {
             printf("Invalid command at line 45\n");
             return 0;
         }
 
         token = strtok(NULL, " ");
-
+        printf("SECOND TOKEN:%s\n",token);
         if (token == NULL) {
             printf("Invalid command at line 52\n");
             return 0;
@@ -52,20 +52,25 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
 
         int client = atoi(token);
 
+        if(atoi(token) == 0 && strcmp(token, "0") != 0){
+            printf("Invalid command at line 58\n");
+            return 0;
+        }
+
         if (client < 0 && client > count) {
             printf("Invalid client at line 58\n");
             return 0;
         }
 
         int *resourceArray = malloc(totalResources * sizeof(int));
-        for (int i = 0; i < totalResources; i++) {
-            resourceArray[i] = atoi(token);
+        for (int i = 0; i < totalResources; i++) { 
             token = strtok(NULL, " ");
-
+            printf("THIRD TOKEN:%s\n",token);
             if (token == NULL) {
                 printf("Invalid command at line 68\n");
                 return 0;
             }
+            resourceArray[i] = atoi(token);
         }
     }
 
@@ -273,23 +278,17 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
              }
 
 
-
-
-
             if (maximumNeedFlag){
-                fprintf(result, "Allocate to customer %d the resources ", client);
 
                 for(int i = 0; i < totalResources; i++){
-                    fprintf(result, "%d ", resourceArray[i]);
                     allocation[client][i] += resourceArray[i];
                     work[i] = work[i] - resourceArray[i];     
-                    printf("%d ",work[i]);
+
 
                 }
 
 
 
-                fprintf(result,"\n");
 
                 for(int i = 0; i < totalResources; i++){
                     clientMaxResources[client][i] -= resourceArray[i];
@@ -309,6 +308,15 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                         allocation[client][i] -= resourceArray[i];
                         work[i] += resourceArray[i];
                     }//desfazer alocacao
+
+                  }else{
+                    fprintf(result,"Allocate to customer %d the resources ", client);
+
+                    for(int i = 0; i < totalResources; i++){
+                        fprintf(result, "%d ", resourceArray[i]);
+                    }
+
+                    fprintf(result,"\n");
 
                   }
 
