@@ -38,44 +38,35 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
         }
 
         char *token = strtok(line, " ");
-        printf("FIRST TOKEN:%s\n",token);
         if (strcmp(token, "RQ") != 0 && strcmp(token, "RL") != 0) {
-            printf("Invalid command at line 45\n");
             return 0;
         }
 
         token = strtok(NULL, " ");
-        printf("SECOND TOKEN:%s\n",token);
         if (token == NULL) {
-            printf("Invalid command at line 52\n");
             return 0;
         }
 
         int client = atoi(token);
 
         if(atoi(token) == 0 && strcmp(token, "0") != 0){
-            printf("Invalid command at line 58\n");
             return 0;
         }
 
         if (client < 0) {
-            printf("Invalid client at line 58\n");
             return 0;
         }
 
         int *resourceArray = malloc(totalResources * sizeof(int));
         for (int i = 0; i < totalResources; i++) { 
             token = strtok(NULL, " ");
-            printf("THIRD TOKEN:%s\n",token);
             if (token == NULL) {
-                printf("Invalid command at line 68\n");
                 return 0;
             }
             
             // Check if the token contains alphabetic characters
             for (int j = 0; j < strlen(token); j++) {
                 if (isalpha(token[j])) {
-                    printf("Invalid command at line 68\n");
                     return 0;
                 }
             }
