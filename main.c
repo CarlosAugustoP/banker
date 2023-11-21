@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 
 int getAmountOfClients(FILE *fp) {
     int count = 0;
@@ -57,7 +58,7 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
             return 0;
         }
 
-        if (client < 0 && client > count) {
+        if (client < 0) {
             printf("Invalid client at line 58\n");
             return 0;
         }
@@ -70,6 +71,15 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
                 printf("Invalid command at line 68\n");
                 return 0;
             }
+            
+            // Check if the token contains alphabetic characters
+            for (int j = 0; j < strlen(token); j++) {
+                if (isalpha(token[j])) {
+                    printf("Invalid command at line 68\n");
+                    return 0;
+                }
+            }
+            
             resourceArray[i] = atoi(token);
         }
     }
