@@ -8,16 +8,88 @@ int getAmountOfClients(FILE *fp) {
     char *line = NULL;
     size_t line_length = 0;
 
-    if (fp == NULL) {
-        printf("Fail to read customer.txt");
-        return -1; 
-    }
-
     while (getline(&line, &line_length, fp) != -1) {
         count++;
     }
 
     return count;
+}
+int countSpaces(char *line){
+    int count = 0;
+    for (int i = 0; i < strlen(line); i++){
+        if (line[i] == ' '){
+            count++;
+        }
+    }
+    return count;
+}
+int isCommandsProperlyFormated(FILE *fp, int totalResources) {
+    int count = 0;
+    char *line = NULL;
+    size_t line_length = 0;
+
+
+    while (getline(&line, &line_length, fp) != -1) {
+        count++;
+
+        if (strcmp(line, "*\n") == 0) {
+            break;
+        }
+
+        char *token = strtok(line, " ");
+
+        if (strcmp(token, "RQ") != 0 && strcmp(token, "RL") != 0) {
+            printf("Invalid command at line 45\n");
+            return 0;
+        }
+
+        token = strtok(NULL, " ");
+
+        if (token == NULL) {
+            printf("Invalid command at line 52\n");
+            return 0;
+        }
+
+        int client = atoi(token);
+
+        if (client < 0 && client > count) {
+            printf("Invalid client at line 58\n");
+            return 0;
+        }
+
+        int *resourceArray = malloc(totalResources * sizeof(int));
+        for (int i = 0; i < totalResources; i++) {
+            resourceArray[i] = atoi(token);
+            token = strtok(NULL, " ");
+
+            if (token == NULL) {
+                printf("Invalid command at line 68\n");
+                return 0;
+            }
+        }
+    }
+
+    free(line);
+    return 1;
+}
+
+int isCustomersProperlyFormated(FILE *fp, int totalResources) {
+    int count = 0;
+    char *line = NULL;
+    size_t line_length = 0;
+
+    while (getline(&line, &line_length, fp) != -1) {
+        
+        if (strspn(line, " \t\n") == strlen(line)) {
+            printf("Empty line detected.\n");
+            return 0;
+        }
+
+        count++;
+    }
+
+    free(line); 
+    return 1; 
 }
 
 int bankersTest(int totalClients, int totalResources, int *available, int **clientMaxResources, int **allocation, int **need) {
@@ -120,7 +192,7 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
 
     }
 
-    if (fp == NULL){
+    if (fp == NULL ){
         printf("Fail to read commands.txt");
         return;
     }
@@ -280,8 +352,30 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
 }
 
 int main(int argc, char *argv[]) {
-    FILE *customers = fopen("customer.txt", "r");
+
     FILE *test = fopen("commands.txt", "r");
+    
+    fseek(test, 0, SEEK_END); 
+    long fileSize = ftell(test); 
+    fseek(test, 0, SEEK_SET);
+    
+    if(fileSize == 0){
+        printf("Fail to read commands.txt\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (test == NULL || !isCommandsProperlyFormated(test,argc-1)){
+        printf("Fail to read commands.txt\n");
+        exit(EXIT_FAILURE);
+    }
+
+    FILE *customers = fopen("customer.txt", "r");
+
+    if (customers == NULL) {
+        printf("Fail to read customer.txt\n");
+        exit(EXIT_FAILURE);
+    }
+
     FILE *result = fopen("result.txt", "w");
 
     int totalClients = getAmountOfClients(customers);
@@ -305,10 +399,7 @@ int main(int argc, char *argv[]) {
     init(&alocation, totalClients, argc - 1);
     init(&cliente, totalClients, argc - 1);
 
-    if (customers == NULL) {
-        perror("Fail to read customer.txt\n");
-        return 1;
-    }
+    
 
     printf("Total clients: %d\n", totalClients);
 
