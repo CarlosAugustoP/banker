@@ -59,7 +59,7 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
         }
         //printf("number of spaces in line:%d\n",countSpaces(line));
 
-        if (countSpaces(line)!= totalResources + 1 && strcmp(line, "*\n") != 0) {
+        if (countSpaces(line)!= totalResources + 1 && strcmp(line, "*\n") != 0) {//this probably needs to be changed!!!!!!
             //printf("TESTING:%d\n",countSpaces(line));
             //printf("Invalid number of arguments in line %d.\n", count + 1);
             return 0;
