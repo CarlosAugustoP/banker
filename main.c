@@ -24,6 +24,27 @@ int countSpaces(char *line){
     }
     return count;
 }
+
+int countCommas(char *line){
+    int count = 0;
+    for (int i = 0; i < strlen(line); i++){
+        if (line[i] == ','){
+            count++;
+        }
+    }
+    return count;
+}
+
+int countDots(char *line){
+    int count = 0;
+    for (int i = 0; i < strlen(line); i++){
+        if (line[i] == '.'){
+            count++;
+        }
+    }
+    return count;
+}
+
 int isCommandsProperlyFormated(FILE *fp, int totalResources) {
     int spacecounter = 0;
     int count = 0;
@@ -33,6 +54,9 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
 
     while (getline(&line, &line_length, fp) != -1) {
         
+        if (countDots(line) >= 1){ //verifica se temos um double sem levar a uma enxaqueca
+            return 0;
+        }
         //printf("number of spaces in line:%d\n",countSpaces(line));
 
         if (countSpaces(line)!= totalResources + 1 && strcmp(line, "*\n") != 0) {
@@ -80,8 +104,12 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
                     return 0;
                 }
             }
-            
-            resourceArray[i] = atoi(token);
+            /* Teste para descobrir se é numero negativo.*/
+            int var = atoi(token);
+            if (var<0) {
+                return 0;
+            }
+            resourceArray[i] = var;
         }
     }
 
@@ -89,36 +117,60 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
     return 1;
 }
 
-int isCustomersProperlyFormated(FILE *fp, int totalResources) {
+int countIntegers(char *str) {
     int count = 0;
+    int inNumber = 0;
+    while (*str) {
+        if (isdigit(*str)) {
+            if (!inNumber) {
+                count++;
+                inNumber = 1;
+            }
+        } else {
+            inNumber = 0;
+        }
+        str++;
+    }
+    return count;
+}
+
+
+int isCustomersProperlyFormated(FILE *fp, int totalResources) {
     char *line = NULL;
     size_t line_length = 0;
 
     while (getline(&line, &line_length, fp) != -1) {
-        printf("%d",strlen(line));
-        if (countSpaces(line) != 0) {
-            printf("Invalid number of spaces in line %d.\n", count + 1);
+        int commasCount = countCommas(line);
+        int numbersCount = countIntegers(line); 
+        // printf("number of commas in line:%d\n",commasCount);
+        // printf("number of numbers in line:%d\n",numbersCount);
+
+        if (commasCount != numbersCount - 1) {
+            free(line);
             return 0;
         }
-        
-        if (strspn(line, " \t\n") == strlen(line)) {
-            printf("Empty line detected.\n");
-            return 0;
+        if (commasCount != totalResources - 1) {
+            free(line);
+            return 2;
         }
-
-        for (int j = 0; j < strlen(line); j++) {
-                if (isalpha(line[j])) {
-                    printf("Invalid character detected in line %d.\n", count + 1);
-                    return 0;
-                }
-            }
-
-
-        count++;
     }
 
-    free(line); 
-    return 1; 
+    free(line);
+
+    return 1;
+}
+
+int verifyCommandLineCommands(FILE *fp, int totalResources){
+    char *line = NULL;
+    size_t line_length = 0;
+    int spaces = 0;
+
+    while (getline(&line, &line_length, fp) != -1) {
+        spaces = countSpaces(line);
+        if (spaces != totalResources - 1 && strcmp(line, "*\n") != 0){
+            return 0;
+        }
+    }return 1;
 }
 
 int bankersTest(int totalClients, int totalResources, int *available, int **clientMaxResources, int **allocation, int **need) {
@@ -416,15 +468,19 @@ int main(int argc, char *argv[]) {
         printf("Fail to read customer.txt\n");
         exit(EXIT_FAILURE);
     }
+    
+    if (!isCustomersProperlyFormated(customers,argc-1)){
+        printf("Fail to read customer.txt\n");
+        exit(EXIT_FAILURE);
+    }
 
-    FILE *result = fopen("result.txt", "w");
+    rewind(customers);
 
     int totalClients = getAmountOfClients(customers);
     int totalRequests = getAmountOfClients(test);
 
     // printf("%d\n",totalRequests);
 
-    fclose(test);
     int available[argc - 1];
     int **cliente;
     int **alocation;
@@ -434,13 +490,9 @@ int main(int argc, char *argv[]) {
         available[i] = atoi(argv[i+1]);
     }
 
-
-
     init(&max, totalClients, argc - 1);
     init(&alocation, totalClients, argc - 1);
     init(&cliente, totalClients, argc - 1);
-
-    
 
     printf("Total clients: %d\n", totalClients);
 
@@ -466,6 +518,17 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+    
+
+    rewind(test);
+    /*
+    if(!verifyCommandLineCommands(test,argc-1)){
+        printf("Incompatibility between commands.txt and command line\n");
+        exit(EXIT_FAILURE);
+    }
+    */
+
+    
 
     for (int i = 0; i < totalClients; i++) {
       printf("Cliente %d:\n",i);  
@@ -475,17 +538,13 @@ int main(int argc, char *argv[]) {
         printf("\n");
     }
 
-   FILE *commands =  fopen ("commands.txt", "r");
-   if (commands == NULL){
-     printf("Fail to read commands.txt");
-     return 1;
-   }
-
-    processRequest(commands, argc - 1, totalClients, cliente,result,alocation,available,max);
+    rewind(test);
+    FILE *result = fopen("result.txt", "w");
+    processRequest(test, argc - 1, totalClients, cliente,result,alocation,available,max);
 
 
     fclose(customers);  
-    fclose(commands);
+    fclose(test);
     fclose(result);
 
 
