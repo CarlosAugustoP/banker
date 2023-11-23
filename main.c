@@ -166,10 +166,18 @@ int isCustomersProperlyFormated(FILE *fp, int totalResources) {
     while (getline(&line, &line_length, fp) != -1) {
         int commasCount = countCommas(line);
         int numbersCount = countIntegers(line); 
+        int spacesCount = countSpaces(line);
         // printf("number of commas in line:%d\n",commasCount);
         // printf("number of numbers in line:%d\n",numbersCount);
-
+        if (atoi(line)<0){
+            free(line);
+            return 0;
+        }
         if (commasCount != numbersCount - 1) {
+            free(line);
+            return 0;
+        }
+        if (spacesCount != 0) {
             free(line);
             return 0;
         }
