@@ -4,8 +4,6 @@
 #include <unistd.h>
 #include <ctype.h>
 
-#define _POSIX_C_SOURCE 200809L
-
 int getAmountOfClients(FILE *fp) {
     int count = 0;
     char *line = NULL;
