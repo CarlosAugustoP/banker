@@ -481,9 +481,14 @@ int main(int argc, char *argv[]) {
         printf("Fail to read customer.txt\n");
         exit(EXIT_FAILURE);
     }
-    
-    if (!isCustomersProperlyFormated(customers,argc-1)){
+    int var2 = isCustomersProperlyFormated(customers,argc-1);
+    if (!var2){
         printf("Fail to read customer.txt\n");
+        exit(EXIT_FAILURE);
+    }
+
+    else if (var2 == 2){
+        printf("Incompatibility between customer.txt and command line\n");
         exit(EXIT_FAILURE);
     }
 
@@ -510,7 +515,7 @@ int main(int argc, char *argv[]) {
     printf("Total clients: %d\n", totalClients);
 
     rewind(customers);
-printf("var: %d\n",var);
+    printf("var: %d\n",var);
 
 if(var != 2){
     printf("cai aqui");
