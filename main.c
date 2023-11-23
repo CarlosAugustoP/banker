@@ -63,6 +63,7 @@ int countDots(char *line){
     return count;
 }
 
+
 int isCommandsProperlyFormated(FILE *fp, int totalResources) {
     int spacecounter = 0;
     int count = 0;
@@ -71,9 +72,14 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
 
 
     while (getline(&line, &line_length, fp) != -1) {
+        /*
         printf("%d\n",countIntegers(line));
         printf("%d\n",countSpaces(line));
         printf("%d\n",totalResources);
+        */
+        if (countIntegers(line) != countSpaces(line) && strcmp(line, "*\n") != 0){
+            return 0;
+        }//deteccao de chars no meio dos numeros
 
         if (countIntegers(line)-1 != totalResources && strcmp(line, "*\n") != 0) {
             return 2;
@@ -119,6 +125,10 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
         int *resourceArray = malloc(totalResources * sizeof(int));//bug probably here, not getting total resources correctly
         for (int i = 0; i < totalResources; i++) { 
             token = strtok(NULL, " ");
+            if (countCommas(token)!=0){
+                printf("cai aqui, linha 123\n");
+                return 0;
+            }
             
             if (token == NULL) {
                 printf("cai aqui, linha 123\n");
@@ -140,6 +150,7 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
             }
             resourceArray[i] = var;
         }
+        
     }
 
     free(line);
