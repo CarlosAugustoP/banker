@@ -71,6 +71,14 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
 
 
     while (getline(&line, &line_length, fp) != -1) {
+        printf("%d\n",countIntegers(line));
+        printf("%d\n",countSpaces(line));
+        printf("%d\n",totalResources);
+
+        if (countIntegers(line)-1 != totalResources && strcmp(line, "*\n") != 0) {
+            return 2;
+        }
+
         if (countDots(line) >= 1){ //verifica se temos um double sem levar a uma enxaqueca
             return 0;
         }
@@ -87,17 +95,20 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
 
         char *token = strtok(line, " ");
         if (strcmp(token, "RQ") != 0 && strcmp(token, "RL") != 0) {
+            printf("cai aqui, linha 98\n");
             return 0;
         }
 
         token = strtok(NULL, " ");
         if (token == NULL) {
+            printf("cai aqui, linha 104\n");
             return 0;
         }
 
         int client = atoi(token);
 
         if(atoi(token) == 0 && strcmp(token, "0") != 0){
+            printf("cai aqui, linha 111\n");
             return 0;
         }
 
@@ -105,16 +116,20 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
             return 0;
         }
 
-        int *resourceArray = malloc(totalResources * sizeof(int));
+        int *resourceArray = malloc(totalResources * sizeof(int));//bug probably here, not getting total resources correctly
         for (int i = 0; i < totalResources; i++) { 
             token = strtok(NULL, " ");
+            
             if (token == NULL) {
+                printf("cai aqui, linha 123\n");
+                printf("cai aqui");
                 return 0;
             }
             
             // Check if the token contains alphabetic characters
             for (int j = 0; j < strlen(token); j++) {
                 if (isalpha(token[j])) {
+                    
                     return 0;
                 }
             }
@@ -445,8 +460,8 @@ int main(int argc, char *argv[]) {
         printf("Fail to read commands.txt\n");
         exit(EXIT_FAILURE);
     }
-
-    if (test == NULL || !isCommandsProperlyFormated(test,argc-1)){
+    int var = isCommandsProperlyFormated(test,argc-1);
+    if (test == NULL || !var){
         printf("Fail to read commands.txt\n");
         exit(EXIT_FAILURE);
     }
@@ -495,7 +510,10 @@ int main(int argc, char *argv[]) {
     printf("Total clients: %d\n", totalClients);
 
     rewind(customers);
+printf("var: %d\n",var);
 
+if(var != 2){
+    printf("cai aqui");
      for (int i = 0; i < totalClients; i++) {
         for (int j = 0; j < argc - 1; j++) {
             if (fscanf(customers, "%d,", &cliente[i][j]) != 1) {
@@ -516,8 +534,10 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    
-
+}else if (var == 2){
+    printf("imcompatibility between commands.txt and command line\n");
+    exit(EXIT_FAILURE);  
+}
     rewind(test);
     /*
     if(!verifyCommandLineCommands(test,argc-1)){
