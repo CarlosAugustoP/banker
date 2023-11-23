@@ -1,4 +1,4 @@
-CC all:main.c
-	gcc -o banker main.c
+CC all:banker.c
+	gcc -o banker banker.c
 clear:
 	rm shell 
