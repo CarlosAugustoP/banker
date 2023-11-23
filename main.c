@@ -35,6 +35,24 @@ int countCommas(char *line){
     return count;
 }
 
+int countIntegers(char *str) {
+    int count = 0;
+    int inNumber = 0;
+    while (*str) {
+        if (isdigit(*str)) {
+            if (!inNumber) {
+                count++;
+                inNumber = 1;
+            }
+        } else {
+            inNumber = 0;
+        }
+        str++;
+    }
+    return count;
+}
+
+
 int countDots(char *line){
     int count = 0;
     for (int i = 0; i < strlen(line); i++){
@@ -53,19 +71,14 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
 
 
     while (getline(&line, &line_length, fp) != -1) {
-        
         if (countDots(line) >= 1){ //verifica se temos um double sem levar a uma enxaqueca
             return 0;
         }
         //printf("number of spaces in line:%d\n",countSpaces(line));
-        /*
-        if (countSpaces(line)!= totalResources + 1 && strcmp(line, "*\n") != 0) {//this probably needs to be changed!!!!!!
-            //printf("TESTING:%d\n",countSpaces(line));
-            //printf("Invalid number of arguments in line %d.\n", count + 1);
+        
+        if (countSpaces(line)!= countIntegers(line) && strcmp(line, "*\n") != 0) {//this probably needs to be changed!!!!!!
             return 0;
         }
-        * this was the bug. must make it so that countnumber of integrers = countnumberofspaces instead of directly pulling from command line */
-
         count++;
 
         if (strcmp(line, "*\n") == 0) {
@@ -118,22 +131,6 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
     return 1;
 }
 
-int countIntegers(char *str) {
-    int count = 0;
-    int inNumber = 0;
-    while (*str) {
-        if (isdigit(*str)) {
-            if (!inNumber) {
-                count++;
-                inNumber = 1;
-            }
-        } else {
-            inNumber = 0;
-        }
-        str++;
-    }
-    return count;
-}
 
 
 int isCustomersProperlyFormated(FILE *fp, int totalResources) {
