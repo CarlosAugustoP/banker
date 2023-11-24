@@ -81,6 +81,9 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
         printf("%d\n",countSpaces(line));
         printf("%d\n",totalResources);
         */
+        if (countIntegers(line) == 0 && strcmp(line, "*\n") != 0){
+            return 0;
+        }//deteccao de linhas vazias
         if (countIntegers(line) != countSpaces(line) && strcmp(line, "*\n") != 0){
             return 0;
         }//deteccao de chars no meio dos numeros
@@ -105,20 +108,20 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
 
         char *token = strtok(line, " ");
         if (strcmp(token, "RQ") != 0 && strcmp(token, "RL") != 0) {
-            printf("cai aqui, linha 98\n");
+            //printf("cai aqui, linha 98\n");
             return 0;
         }
 
         token = strtok(NULL, " ");
         if (token == NULL) {
-            printf("cai aqui, linha 104\n");
+            //printf("cai aqui, linha 104\n");
             return 0;
         }
 
         int client = atoi(token);
 
         if(atoi(token) == 0 && strcmp(token, "0") != 0){
-            printf("cai aqui, linha 111\n");
+            //printf("cai aqui, linha 111\n");
             return 0;
         }
 
@@ -130,13 +133,13 @@ int isCommandsProperlyFormated(FILE *fp, int totalResources) {
         for (int i = 0; i < totalResources; i++) { 
             token = strtok(NULL, " ");
             if (countCommas(token)!=0){
-                printf("cai aqui, linha 123\n");
+                //printf("cai aqui, linha 123\n");
                 return 0;
             }
             
             if (token == NULL) {
-                printf("cai aqui, linha 123\n");
-                printf("cai aqui");
+                //printf("cai aqui, linha 123\n");
+                //printf("cai aqui");
                 return 0;
             }
             
@@ -308,7 +311,7 @@ int format (){
 void processRequest(FILE *fp, int totalResources, int totalClients, int **clientMaxResources,FILE *result, int **allocation, int work[], int **max) {
 
     for (int i =0;i<totalResources;i++){
-        printf("%d ",work[i]);
+        //printf("%d ",work[i]);
 
     }
 
@@ -340,7 +343,7 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                 }
             
             comparison1 = x + MAX_WORD_SIZE;
-            printf("O título teve de ser aumentado %d espaços\n",comparison1);
+            //printf("O título teve de ser aumentado %d espaços\n",comparison1);
 
             fprintf(result, "|");
             fprintf(result, " ALLOCATION ");//"allocation" tem 10 letras
@@ -353,15 +356,15 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                 }
 
             comparison2 = y + ALOCCATION_WORD_SIZE;
-            printf("O título teve de ser aumentado %d espaços\n",comparison2);
+            //printf("O título teve de ser aumentado %d espaços\n",comparison2);
             
             if(totalResources>5 && totalResources<7){  
-                printf("cai aqui");
+                //printf("cai aqui");
                 fprintf(result, " ");
                 //sleep(2);
             }
             else if (totalResources>6 ){
-                printf("oi");
+                //printf("oi");
                 fprintf(result, "  ");
                 
             }
@@ -527,9 +530,9 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                 for(int i = 0; i < totalResources; i++){
                     fprintf(result,"%d ", resourceArray[i]);
                     work[i] += resourceArray[i];
-                    printf("%d ",work[i]);
+                    //printf("%d ",work[i]);
                 }
-                printf("\n");
+                //printf("\n");
 
                 fprintf(result,"\n");
 
@@ -609,13 +612,13 @@ int main(int argc, char *argv[]) {
     init(&alocation, totalClients, argc - 1);
     init(&cliente, totalClients, argc - 1);
 
-    printf("Total clients: %d\n", totalClients);
+    //printf("Total clients: %d\n", totalClients);
 
     rewind(customers);
-    printf("var: %d\n",var);
+    //printf("var: %d\n",var);
 
 if(var != 2){
-    printf("cai aqui");
+    //printf("cai aqui");
      for (int i = 0; i < totalClients; i++) {
         for (int j = 0; j < argc - 1; j++) {
             if (fscanf(customers, "%d,", &cliente[i][j]) != 1) {
@@ -649,7 +652,7 @@ if(var != 2){
     */
 
     
-
+    /*
     for (int i = 0; i < totalClients; i++) {
       printf("Cliente %d:\n",i);  
         for (int j = 0; j < argc - 1; j++) {
@@ -657,6 +660,7 @@ if(var != 2){
         }
         printf("\n");
     }
+    */
 
     rewind(test);
     FILE *result = fopen("result.txt", "w");
