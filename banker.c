@@ -512,7 +512,7 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
             int flag = 1;
             for(int i = 0; i < totalResources; i++){
                 if(resourceArray[i] > allocation[client][i]){
-                    fprintf(result,"The customer %d release ", client);
+                    fprintf(result,"The customer %d released ", client);
                     for(int i = 0; i < totalResources; i++){
                         fprintf(result, "%d ", resourceArray[i]);
                     }
