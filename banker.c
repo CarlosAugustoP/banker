@@ -413,10 +413,8 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
             
             comparison1 = x + MAX_WORD_SIZE;
             //printf("O título teve de ser aumentado %d espaços\n",comparison1);
-            if (totalResources>3){
             for(int i = 0;i<titleincrease1;i++){
                 fprintf(result," ");
-            }
             }
             titleincrease1 = 0;
             fprintf(result, "|");
@@ -459,12 +457,7 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                 fprintf(result, "%d ", max[i][j]);
                 counter1++;
             }
-            if (titleincrease1==0){
-                for(int i = 0;i<titleincrease1;i++){
-                    fprintf(result," ");
-                }
-            }
-            else if (counter1 + totalResources < comparison1){
+            if (counter1 + totalResources < comparison1){
                 for(int i = 0; i < comparison1 - (counter1 + totalResources); i++){
                     fprintf(result, " ");
                 }
