@@ -67,12 +67,11 @@ int countDots(char *line){
     return count;
 }
 
-int countDigits(char *line){
+int countDigits(int number){
     int count = 0;
-    for (int i = 0; i < strlen(line); i++){
-        if (isdigit(line[i])){
-            count++;
-        }
+    while (number != 0) {
+        number /= 10;
+        count++;
     }
     return count;
 }
@@ -314,8 +313,12 @@ int **sumMatrixes(int **matrix1,int **matrix2, int **resultmatrix, int totalClie
 
 }
 
-int format (){
-
+int sumArray (int *array, int totalResources){
+    int sum = 0;
+    for (int i = 0; i < totalResources; i++){
+        sum += array[i];
+    }
+    return sum;
 }
 
 void processRequest(FILE *fp, int totalResources, int totalClients, int **clientMaxResources,FILE *result, int **allocation, int work[], int **max) {
@@ -343,9 +346,62 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
     int counter1 = 0;
     int comparison1 = 0;
     int comparison2 = 0;
+    int titleincrease1 = 0;
+    int titleincrease2 = 0;
 
     while(getline(&line, &line_length, fp) != -1){
          if (strcmp(line, "*\n") == 0) {
+            int max_size[totalResources]; // max_width_max[0] = x
+            int allocation_size[totalResources];
+            int need_size[totalResources];
+
+            for(int i = 0; i < totalResources; i++){
+             max_size[i] = 0;
+             allocation_size[i] = 0;
+             need_size[i] = 0;
+            }
+
+            for (int i = 0; i < totalClients; i++) {
+                for (int j = 0; j < totalResources; j++) {
+                    int digits = countDigits(max[i][j]);
+                    if (digits > max_size[j]) {
+                        max_size[j] = digits;
+                    }
+
+                    
+                }
+            }
+            for (int i = 0; i < totalClients; i++) {
+                for (int j = 0; j < totalResources; j++) {
+                    int digits = countDigits(allocation[i][j]);
+                    if (digits > allocation_size[j]) {
+                        allocation_size[j] = digits;
+                    }
+
+                    
+                }
+            }
+            for (int i = 0; i < totalClients; i++) {
+                for (int j = 0; j < totalResources; j++) {
+                    int digits = countDigits(clientMaxResources[i][j]);
+                    if (digits > need_size[j]) {
+                        need_size[j] = digits;
+                    }
+
+                    
+                }
+            }
+            for(int i = 0; i < totalResources; i++){
+                printf("%d ",max_size[i]);
+            }
+            for(int i = 0; i < totalResources; i++){
+                printf("%d ",allocation_size[i]);
+            }
+            titleincrease1 = sumArray(max_size,totalResources)-totalResources;
+            printf("titleincrease: %d\n",titleincrease1);
+            titleincrease2 = sumArray(allocation_size,totalResources)-totalResources;
+            printf("titleincrease: %d\n",titleincrease2);
+            
             fprintf(result, "MAXIMUM ");//"maximum" tem 7 letra
             if (totalResources + (totalResources - 1) > 7){
                     for(int i = 0; i < totalResources + (totalResources - 1) - 7; i++){
@@ -357,7 +413,12 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
             
             comparison1 = x + MAX_WORD_SIZE;
             //printf("O título teve de ser aumentado %d espaços\n",comparison1);
-
+            if (totalResources>3){
+            for(int i = 0;i<titleincrease1;i++){
+                fprintf(result," ");
+            }
+            }
+            titleincrease1 = 0;
             fprintf(result, "|");
             fprintf(result, " ALLOCATION ");//"allocation" tem 10 letras
             if (totalResources + (totalResources - 1) > ALOCCATION_WORD_SIZE){
@@ -370,6 +431,9 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
 
             comparison2 = y + ALOCCATION_WORD_SIZE;
             //printf("O título teve de ser aumentado %d espaços\n",comparison2);
+            for(int i = 0;i<titleincrease2;i++){
+                fprintf(result," ");
+            }
             
             if(totalResources>5 && totalResources<7){  
                 //printf("cai aqui");
@@ -386,10 +450,21 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
             fprintf(result, "\n");
             for (int i = 0; i < totalClients; i++) {
             for (int j = 0; j < totalResources; j++) {
+
+            if (max_size[j]!=1 && countDigits(max[i][j]) != max_size[j]){
+                for(int i = 0;i<max_size[j]-1;i++){
+                    fprintf(result," ");
+                }
+            }
                 fprintf(result, "%d ", max[i][j]);
                 counter1++;
             }
-            if (counter1 + totalResources < comparison1){
+            if (titleincrease1==0){
+                for(int i = 0;i<titleincrease1;i++){
+                    fprintf(result," ");
+                }
+            }
+            else if (counter1 + totalResources < comparison1){
                 for(int i = 0; i < comparison1 - (counter1 + totalResources); i++){
                     fprintf(result, " ");
                 }
@@ -398,7 +473,13 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
             fprintf(result, "| ");
         
             for (int j = 0; j < totalResources; j++) {
+                if (allocation_size[j]!=1 && countDigits(allocation[i][j]) != allocation_size[j]){
+                    for(int i = 0;i<allocation_size[j]-1;i++){
+                        fprintf(result," ");
+                    }
+                }
                 fprintf(result, "%d ", allocation[i][j]);
+
                 counter1++;
             }
 
@@ -414,6 +495,11 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
 
             
             for (int j = 0; j < totalResources; j++) {
+                if (need_size[j]!=1 && countDigits(clientMaxResources[i][j]) != need_size[j]){
+                    for(int i = 0;i<need_size[j]-1;i++){
+                        fprintf(result," ");
+                    }
+                }
                 fprintf(result, "%d ", clientMaxResources[i][j]);
             }
     
