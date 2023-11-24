@@ -636,6 +636,11 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
 int main(int argc, char *argv[]) {
 
     FILE *test = fopen("commands.txt", "r");
+
+    if (test == NULL) {
+        printf("Fail to read commands.txt\n");
+        exit(EXIT_FAILURE);
+    }
     
     fseek(test, 0, SEEK_END); 
     long fileSize = ftell(test); 
@@ -653,6 +658,11 @@ int main(int argc, char *argv[]) {
 
     FILE *customers = fopen("customer.txt", "r");
 
+    if (customers == NULL) {
+        printf("Fail to read customer.txt\n");
+        exit(EXIT_FAILURE);
+    }
+
     fseek(customers, 0, SEEK_END); 
     fileSize = ftell(customers); 
     fseek(customers, 0, SEEK_SET);
@@ -662,10 +672,6 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    if (customers == NULL) {
-        printf("Fail to read customer.txt\n");
-        exit(EXIT_FAILURE);
-    }
     int var2 = isCustomersProperlyFormated(customers,argc-1);
     if (!var2){
         printf("Fail to read customer.txt\n");
