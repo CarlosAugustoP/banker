@@ -67,6 +67,16 @@ int countDots(char *line){
     return count;
 }
 
+int countDigits(char *line){
+    int count = 0;
+    for (int i = 0; i < strlen(line); i++){
+        if (isdigit(line[i])){
+            count++;
+        }
+    }
+    return count;
+}
+
 
 int isCommandsProperlyFormated(FILE *fp, int totalResources) {
     int spacecounter = 0;
@@ -310,6 +320,9 @@ int format (){
 
 void processRequest(FILE *fp, int totalResources, int totalClients, int **clientMaxResources,FILE *result, int **allocation, int work[], int **max) {
 
+    int max_size[totalResources];
+    int allocation_size[totalResources];
+
     for (int i =0;i<totalResources;i++){
         //printf("%d ",work[i]);
 
@@ -408,7 +421,7 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
             fprintf(result, "\n");
     }
 
-    fprintf(result,"AVAILABLE: ");
+    fprintf(result,"AVAILABLE ");
     for (int i = 0; i < totalResources; i++){
         fprintf(result,"%d ",work[i]);
     }
