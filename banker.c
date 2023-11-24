@@ -388,7 +388,7 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                 fprintf(result, "%d ", allocation[i][j]);
                 counter1++;
             }
-            printf("%d",counter1+2+totalResources-1);
+
             if (counter1 + totalResources + 1 < comparison2) {
                 for (int i = 0; i < comparison2 - (counter1 + totalResources + 1); i++) {
                     fprintf(result, " ");
