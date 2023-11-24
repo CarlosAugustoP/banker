@@ -384,7 +384,7 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
             }
             fprintf(result, "| ");
             
-            counter2 = 0;
+            counter1 = 0;
 
             
             for (int j = 0; j < totalResources; j++) {
