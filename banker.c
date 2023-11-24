@@ -391,16 +391,9 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                     
                 }
             }
-            for(int i = 0; i < totalResources; i++){
-                printf("%d ",max_size[i]);
-            }
-            for(int i = 0; i < totalResources; i++){
-                printf("%d ",allocation_size[i]);
-            }
+           
             titleincrease1 = sumArray(max_size,totalResources)-totalResources;
-            printf("titleincrease: %d\n",titleincrease1);
             titleincrease2 = sumArray(allocation_size,totalResources)-totalResources;
-            printf("titleincrease: %d\n",titleincrease2);
             
             fprintf(result, "MAXIMUM ");//"maximum" tem 7 letra
             if (totalResources + (totalResources - 1) > 7){
@@ -732,7 +725,7 @@ if(var != 2){
         }
     }
 }else if (var == 2){
-    printf("imcompatibility between commands.txt and command line\n");
+    printf("incompatibility between commands.txt and command line\n");
     exit(EXIT_FAILURE);  
 }
     rewind(test);
