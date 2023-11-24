@@ -4,6 +4,10 @@
 #include <unistd.h>
 #include <ctype.h>
 
+#define MAX_WORD_SIZE 8
+#define ALOCCATION_WORD_SIZE 12
+#define NEED_WORD_SIZE 5
+
 int getAmountOfClients(FILE *fp) {
     int count = 0;
     char *line = NULL;
@@ -297,6 +301,9 @@ int **sumMatrixes(int **matrix1,int **matrix2, int **resultmatrix, int totalClie
 
 }
 
+int format (){
+
+}
 
 void processRequest(FILE *fp, int totalResources, int totalClients, int **clientMaxResources,FILE *result, int **allocation, int work[], int **max) {
 
@@ -315,23 +322,84 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
     int client;
     char command[3];
     int *resourceArray;
+    int x = 0;
+    int y = 0;
+    int counter1 = 0;
+    int comparison1 = 0;
+    int comparison2 = 0;
 
     while(getline(&line, &line_length, fp) != -1){
          if (strcmp(line, "*\n") == 0) {
-            fprintf(result,"Max:\n");
-            print(result, max , totalClients, totalResources);
+            fprintf(result, "MAXIMUM ");//"maximum" tem 7 letra
+            if (totalResources + (totalResources - 1) > 7){
+                    for(int i = 0; i < totalResources + (totalResources - 1) - 7; i++){
+                        fprintf(result, " ");
+                        x++;
+                    }
 
-            fprintf(result,"Alocation:\n");
-            print(result, allocation, totalClients, totalResources);
+                }
+            
+            comparison1 = x + MAX_WORD_SIZE;
+            printf("O título teve de ser aumentado %d espaços\n",comparison1);
 
-            fprintf(result,"Need:\n");
-            print(result, clientMaxResources, totalClients, totalResources);
+            fprintf(result, "|");
+            fprintf(result, " ALLOCATION ");//"allocation" tem 10 letras
+            if (totalResources + (totalResources - 1) > ALOCCATION_WORD_SIZE){
+                   for(int i = 0; i < totalResources + (totalResources - 1) - ALOCCATION_WORD_SIZE; i++){
+                        fprintf(result, " ");
+                        y++;
+                        
+                    }
+                }
 
-            fprintf(result,"Available\n");
-            for (int i =0;i<totalResources;i++){
-                fprintf(result,"%d ",work[i]);
-            }fprintf(result,"\n");
+            comparison2 = y + ALOCCATION_WORD_SIZE;
+            printf("O título teve de ser aumentado %d espaços\n",comparison2);
+            
+            
+            fprintf(result, "|");
+            fprintf(result, " NEED");//"need" tem 4 letras
+            fprintf(result, "\n");
+            for (int i = 0; i < totalClients; i++) {
+            for (int j = 0; j < totalResources; j++) {
+                fprintf(result, "%d ", max[i][j]);
+                counter1++;
+            }
+            if (counter1 + totalResources < comparison1){
+                for(int i = 0; i < comparison1 - (counter1 + totalResources); i++){
+                    fprintf(result, " ");
+                }
+            }
+            counter1 = 0;
+            fprintf(result, "| ");
+        
+            for (int j = 0; j < totalResources; j++) {
+                fprintf(result, "%d ", allocation[i][j]);
+                counter1++;
+            }
+            printf("%d",counter1+2+totalResources-1);
+            if (counter1 + totalResources + 1 < comparison2) {
+                for (int i = 0; i < comparison2 - (counter1 + totalResources + 1); i++) {
+                    fprintf(result, " ");
+                }
+            }
+            fprintf(result, "| ");
+            
+            counter2 = 0;
 
+            
+            for (int j = 0; j < totalResources; j++) {
+                fprintf(result, "%d ", clientMaxResources[i][j]);
+            }
+    
+
+            fprintf(result, "\n");
+    }
+
+    fprintf(result,"AVAILABLE: ");
+    for (int i = 0; i < totalResources; i++){
+        fprintf(result,"%d ",work[i]);
+    }
+    fprintf(result,"\n");
         }else{
 
         char *token = strtok(line, " ");
