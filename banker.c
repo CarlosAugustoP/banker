@@ -355,7 +355,16 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
             comparison2 = y + ALOCCATION_WORD_SIZE;
             printf("O título teve de ser aumentado %d espaços\n",comparison2);
             
-            
+            if(totalResources>5 && totalResources<7){  
+                printf("cai aqui");
+                fprintf(result, " ");
+                //sleep(2);
+            }
+            else if (totalResources>6 ){
+                printf("oi");
+                fprintf(result, "  ");
+                
+            }
             fprintf(result, "|");
             fprintf(result, " NEED");//"need" tem 4 letras
             fprintf(result, "\n");
@@ -382,6 +391,7 @@ void processRequest(FILE *fp, int totalResources, int totalClients, int **client
                     fprintf(result, " ");
                 }
             }
+            
             fprintf(result, "| ");
             
             counter1 = 0;
